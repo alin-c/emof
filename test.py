@@ -2,6 +2,7 @@ import requests, re
 
 number = ''
 year = ''
+file_location = 'C:/Users/Alin/Desktop/'
 
 #check the input and continue only if it is valid
 def issueInput():
@@ -19,9 +20,9 @@ def issueInput():
 	return [number, year]
 
 issue = issueInput()
-url = 'http://www.monitoruloficial.ro/emonitornew/services/view.php' #doc=0120190435&format=json&page=1
+url = 'http://www.monitoruloficial.ro/emonitornew/services/view.php'
 user_agent = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64)'
-referer = 'http://www.monitoruloficial.ro/emonitornew/emonviewmof.php' #?fid=MS43OTEzNzc4NjUyNTc1RSszMA==
+referer = 'http://www.monitoruloficial.ro/emonitornew/emonviewmof.php'
 			
 headers = {'User-Agent': user_agent,
 			'Referer': referer,
@@ -33,10 +34,11 @@ params = {'doc': '01' + year + number,
 			
 session = requests.Session()
 
-for i in range(1, 5):
+for i in range(1,2000):
 	params['page'] = str(i)
 	response = session.get(url, headers = headers, params = params)
-	file_location = 'C:/Users/Alin/Desktop/'
+	if (str(response).startswith('Error')):
+		break
 	file_name = file_location + number + '-' + params['page'] + '.jpg'
 	with open(file_name, 'wb') as fd:
 		for chunk in response.iter_content(chunk_size=128):
