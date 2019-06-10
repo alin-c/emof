@@ -2,84 +2,83 @@
 mo.py
 0.0.1
 Script for saving Monitorul Oficial files as pdf
-
-Steps:
-1. get input from user: number/year
-2. get json to find number of pages
-	GET http://www.monitoruloficial.ro/emonitornew/services/view.php?doc=0120190435&format=json&page=10
-	doc=0120190435
-	format=json
-	page=10
-	
-	Host: www.monitoruloficial.ro
-	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:67.0) Gecko/20100101 Firefox/67.0
-	Accept: application/json, text/javascript, */*; q=0.01
-	Accept-Language: en-US,en;q=0.5
-	Accept-Encoding: gzip, deflate
-	Referer: http://www.monitoruloficial.ro/emonitornew/emonviewmof.php?fid=MS43OTEzNzc4NjUyNTc1RSszMA==
-	X-Requested-With: XMLHttpRequest
-	DNT: 1
-	Connection: keep-alive
-	Cookie: PHPSESSID=uh7u2m2cstv1p2a8s5jeqepcb0; cookieconsent_dismissed=yes
-	
-	response:
-	[{"number":1,"pages":16,...}]
-	
-3. loop to get each image from 1 to total number of pages
-
-	GET http://www.monitoruloficial.ro/emonitornew/services/view.php?doc=0120190435&format=jpg&page=1
-	Referer: http://www.monitoruloficial.ro/emonitornew/emonviewmof.php?fid=MS43OTEzNzc4NjUyNTc1RSszMA==
-	
-	Transfer-Encoding: chunked
-	Content-Type: image/jpeg
-
-	
-4. combine images into a pdf and save it
-
-Requirements:
-1. Python 3.7.2
-2. pip install fpdf
-
 """
-
-import re, os, traceback, urllib.request
+import requests, re, sys, os
 from fpdf import FPDF
-from PIL import Image
 
-#1. get input from user: number/year
+pdf = FPDF('P', 'mm', 'A4')
+pdf.set_display_mode('real')
+
+file_location = os.environ['temp'] #%temp% is used in Windows, for other OS this variable needs to be changed
+pdf_location = os.environ['userprofile'] + "\\Desktop\\" #for easy finding
 
 #check the input and continue only if it is valid
-def issueInput():
+while True:
 	issue = input("Scrie numărul și anul Monitorului Oficial (număr/an): ")
-	if (issue != "a"): #test a regex pattern [\dbis]*?/\d{4}
-		issueInput()
-	#if the issue is valid separate number from year and return the two values as a list [number, year]
-	return [number, year]
+	pattern = r'([\d bis]*?)/(\d{4})'
+	result = re.match(pattern, issue, re.IGNORECASE)
+	if result == None: #test a regex pattern [\dbis]*?/\d{4}
+		print("\nNumărul sau anul nu sunt scrise corect. Mai încearcă o dată.")
+		continue
+	else:
+		#if the issue is valid separate number from year and return the two values
+		number = result.groups()[0].replace(' ', '').lower() #remove spaces and make the string lowercase
+		if number.find('bis') >= 0: #check if bis is present
+			number = number.replace('b', 'B').zfill(7)
+		else:
+			number = number.zfill(4)
+		year = result.groups()[1]
+		break
 
-issue = issueInput()
+#prepare and make the HTTP request to retrieve the images
+url = 'http://www.monitoruloficial.ro/emonitornew/services/view.php'
+user_agent = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64)'
+referer = 'http://www.monitoruloficial.ro/emonitornew/emonviewmof.php'
+headers = {'User-Agent': user_agent,
+			'Referer': referer,
+			'X-Requested-With': 'XMLHttpRequest'}
+params = {'doc': '01' + year + number,
+			'format': 'jpg',
+			'page': '1' }
+session = requests.Session()
+file_list = []
 
-#2. get json to find number of pages
-#build the URL
-#build the query
-#run the query with format=json param and return the page count from JSON
+print("\nSe încearcă descărcarea imaginilor.")
+for i in range(1, 2500): #2500 is arbitrary, but probably wouldn't be reached in realistic scenarios
+	params['page'] = str(i)
+	response = session.get(url, headers = headers, params = params)
+	
+	if str(response.content).find('Error') >= 0: #exit the loop if 'error' is detected in the response
+		break
+	
+	file_name = file_location + number + '-' + params['page'] + '.jpg'
+	with open(file_name, 'wb') as fd:
+		for chunk in response.iter_content(chunk_size=128):
+			fd.write(chunk)
+	print(str(i), end=' ') #display some progress
+	sys.stdout.flush()
+	file_list.append(file_name) #add image location to the list
 
-#3. get each page from 1 to total number of pages
-#run the same query with format=jpg param for each page from 1 to numPages and store the resulting image to a \tmp folder and a list
+#iterate through the list of downloaded images and generate a pdf
+def make_pdf(image_list):
+	print("\nSe generează PDF din imaginile descărcate.")
+	for image in image_list:
+		pdf.add_page()
+		pdf.image(image, 0, 0, 210, 297)
+	pdf.output(pdf_location + number + ".pdf", "F")
 
-#4. combine pages into a pdf and save it
-#loop through the image list and generate PDF
+#iterate through the list of downloaded images and delete them
+def cleanup(image_list):
+	print("\nSunt șterse imaginile descărcate.")
+	for image in image_list:
+		if os.path.exists(image):
+			os.remove(image)
+		else:
+			print("\nNu există imaginea de la adresa: " + image)
 
-def makePdf(pdfFileName, listPages, dir = ''):
-    if (dir):
-        dir += "/"
+#do the document generation and then cleanup
+make_pdf(file_list)
+cleanup(file_list)
 
-    cover = Image.open(dir + str(listPages[0]) + ".jpg")
-    width, height = cover.size
-
-    pdf = FPDF(unit = "pt", format = [width, height])
-
-    for page in listPages:
-        pdf.add_page()
-        pdf.image(dir + str(page) + ".jpg", 0, 0)
-
-    pdf.output(dir + pdfFileName + ".pdf", "F")
+print('\nGata! Documentul este salvat aici: ' + pdf_location + number + ".pdf")
+os.system("pause")
