@@ -1,1 +1,7 @@
 This tool accesses the freely accessible "e-monitor" using input parameters, retrieves the image pages, combines the images as pdf and then outputs the resulting pdf.
+
+TODO:
+0. improve the code
+1. access other parts of Monitorul Oficial
+2. OCR
+3. batch capability
