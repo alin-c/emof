@@ -1,6 +1,6 @@
 """
 mo.py
-0.0.1
+0.0.2
 Script for saving Monitorul Oficial files as pdf
 """
 import requests, re, sys, os
@@ -9,7 +9,7 @@ from fpdf import FPDF
 pdf = FPDF('P', 'mm', 'A4')
 pdf.set_display_mode('real')
 
-file_location = os.environ['temp'] #%temp% is used in Windows, for other OS this variable needs to be changed
+file_location = os.environ['temp'] + "\\" #%temp% is used in Windows, for other OS this variable needs to be changed
 pdf_location = os.environ['userprofile'] + "\\Desktop\\" #for easy finding
 
 #check the input and continue only if it is valid
