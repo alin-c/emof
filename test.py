@@ -1,28 +1,46 @@
+"""
+mo.py
+0.0.2
+Script for saving Monitorul Oficial files as pdf
+
+* prerequisites:
+- pip install requests
+- pip install fpdf
+"""
 import requests, re, sys, os
 from fpdf import FPDF
 
 pdf = FPDF('P', 'mm', 'A4')
-pdf.set_display_mode('real')
+pdf.set_display_mode('real', 'continuous')
 
-file_location = os.environ['temp'] #%temp% is used in Windows, for other OS this variable needs to be changed
+file_location = os.environ['temp'] + "\\" #%temp% is used in Windows, for other OS this variable needs to be changed
 pdf_location = os.environ['userprofile'] + "\\Desktop\\" #for easy finding
 
 #check the input and continue only if it is valid
 while True:
-	issue = input("Scrie numărul și anul Monitorului Oficial (număr/an): ")
-	pattern = r'([\d bis]*?)/(\d{4})'
+	issue = input("Monitorul Oficial ([parte/]număr/an): ")
+	pattern = r"(?:(\d)/)*?([\d bis]*?)/(\d{4})"
+	part = '01'
 	result = re.match(pattern, issue, re.IGNORECASE)
 	if result == None: #test a regex pattern [\dbis]*?/\d{4}
 		print("\nNumărul sau anul nu sunt scrise corect. Mai încearcă o dată.")
 		continue
 	else:
+		#if the part is specified, use it, else consider it to be part 01
+		#part numbers above 1 are mapped in fact to index + 1
+		#Hungarian language version of part 01 is mapped to 02 - currently not supported
+		if result.groups()[0] != None:
+			index = result.groups()[0].replace("/", "")
+			if int(index) > 1: 
+				index = str(int(index) + 1)
+			part = "0" + index
 		#if the issue is valid separate number from year and return the two values
-		number = result.groups()[0].replace(' ', '').lower() #remove spaces and make the string lowercase
+		number = result.groups()[1].replace(' ', '').lower() #remove spaces and make the string lowercase
 		if number.find('bis') >= 0: #check if bis is present
 			number = number.replace('b', 'B').zfill(7)
 		else:
 			number = number.zfill(4)
-		year = result.groups()[1]
+		year = result.groups()[2]
 		break
 
 #prepare and make the HTTP request to retrieve the images
@@ -32,7 +50,7 @@ referer = 'http://www.monitoruloficial.ro/emonitornew/emonviewmof.php'
 headers = {'User-Agent': user_agent,
 			'Referer': referer,
 			'X-Requested-With': 'XMLHttpRequest'}
-params = {'doc': '01' + year + number,
+params = {'doc': part + year + number,
 			'format': 'jpg',
 			'page': '1' }
 session = requests.Session()

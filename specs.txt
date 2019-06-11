@@ -2,6 +2,6 @@ This tool accesses the freely accessible "e-monitor" using input parameters, ret
 
 TODO:
 0. improve the code
-1. access other parts of Monitorul Oficial
+1. access other parts of Monitorul Oficial: DONE!
 2. OCR
 3. batch capability
