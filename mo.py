@@ -18,8 +18,8 @@ pdf_location = os.environ['userprofile'] + "\\Desktop\\" #for easy finding
 
 #check the input and continue only if it is valid
 while True:
-	issue = input("Monitorul Oficial ([parte/]număr/an): ")
-	pattern = r"(?:(\d)/)*?([\d bis]*?)/(\d{4})"
+	issue = input("Monitorul Oficial ([parte/]număr/an): ").replace(' ', '').lower()
+	pattern = r"(?:(\d)/)*?([\dbis ]+?)/(\d{4})$"
 	part = '01'
 	result = re.match(pattern, issue, re.IGNORECASE)
 	if result == None: #test a regex pattern [\dbis]*?/\d{4}
@@ -35,7 +35,7 @@ while True:
 				index = str(int(index) + 1)
 			part = "0" + index
 		#if the issue is valid separate number from year and return the two values
-		number = result.groups()[1].replace(' ', '').lower() #remove spaces and make the string lowercase
+		number = result.groups()[1] #remove spaces and make the string lowercase
 		if number.find('bis') >= 0: #check if bis is present
 			number = number.replace('b', 'B').zfill(7)
 		else:
@@ -52,11 +52,11 @@ headers = {'User-Agent': user_agent,
 			'X-Requested-With': 'XMLHttpRequest'}
 params = {'doc': part + year + number,
 			'format': 'jpg',
-			'page': '1' }
+			'page': '1'}
 session = requests.Session()
 file_list = []
 
-print("\nSe încearcă descărcarea imaginilor.")
+print("\nSe încearcă descărcarea imaginilor.\n")
 for i in range(1, 2500): #2500 is arbitrary, but probably wouldn't be reached in realistic scenarios
 	params['page'] = str(i)
 	response = session.get(url, headers = headers, params = params)
