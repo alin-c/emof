@@ -1,6 +1,6 @@
 """
 mo.py
-0.0.3
+0.0.4
 Script for saving Monitorul Oficial files as pdf
 
 * prerequisites:
@@ -74,6 +74,9 @@ for i in range(1, 2500): #2500 is arbitrary, but probably wouldn't be reached in
 
 #iterate through the list of downloaded images and generate a pdf
 def make_pdf(image_list):
+	if (not image_list):
+		print("\nNu s-a găsit niciun document!")
+		return 0
 	print("\nSe generează PDF din imaginile descărcate.")
 	for image in image_list:
 		pdf.add_page()
@@ -82,6 +85,8 @@ def make_pdf(image_list):
 
 #iterate through the list of downloaded images and delete them
 def cleanup(image_list):
+	if (not image_list):
+		return 0
 	print("\nSunt șterse imaginile descărcate.")
 	for image in image_list:
 		if os.path.exists(image):
@@ -89,9 +94,8 @@ def cleanup(image_list):
 		else:
 			print("\nNu există imaginea de la adresa: " + image)
 
-#do the document generation and then cleanup
-make_pdf(file_list)
-cleanup(file_list)
-
-print('\nGata! Documentul este salvat aici: ' + pdf_location + number + ".pdf")
+#do the document generation and then cleanup, but only if there were images found
+if make_pdf(file_list) != 0:
+	cleanup(file_list)
+	print('\nGata! Documentul este salvat aici: ' + pdf_location + number + ".pdf")
 os.system("pause")
