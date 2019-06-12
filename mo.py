@@ -1,20 +1,22 @@
 manifest = """mo.py
-0.0.5
+0.0.6
 *********************************************************************************************
 Script pentru generarea de documente .pdf pe baza imaginilor publicate de M.O.
 Documentul .pdf va fi salvat pe Desktop.
 
 Funcționează numai pentru numerele publicate din 06.06.2017 (de la Partea I, nr. 414/2017)
 până în prezent.
-Nu funcționează pentru Partea I în limba maghiară și nici pentru numere non-standard (ex. 
-17c), cu excepția celor cu "bis".
 
 Formatul de input este:
 [parte/]număr/an, indicarea părții este opțională doar dacă se caută un număr din Partea I
 
+Pentru Partea I în limba maghiară, trebuie folosit 1m (ex. 1m/21/2019).
+
 Exemple de utilizare:
 1. 1/414/2017 echivalent cu 414/2017 => Partea I, nr. 414 din 2017
 2. 4/2378/2019 => Partea a IV-a, nr. 2378 din 2019
+3. 2/17c/2019 => Partea a II-a, nr. 17/C din 2019
+4. 1m/21/2019 => Partea I în limba maghiară, nr. 21 din 2019
 *********************************************************************************************
 """
 print(manifest) #comment this line to supress the manifest
@@ -31,25 +33,28 @@ pdf_location = os.environ['userprofile'] + "\\Desktop\\" #for easy finding
 #the input loop: check the input and continue only if it is valid
 while True:
 	issue = input("Monitorul Oficial ([parte/]număr/an): ").replace(' ', '').lower()
-	pattern = r"(?:(\d)/)*?([\dbis ]+?)/(\d{4})$"
+	pattern = r"(?:(\dm*?)/)*?([\dbis c]+?)/(\d{4})$"
 	part = '01'
 	result = re.match(pattern, issue, re.IGNORECASE)
 	if result == None: #test a regex pattern [\dbis]*?/\d{4}
-		print("\nNumărul sau anul nu sunt scrise corect. Mai încearcă o dată.")
+		print("\nPartea, numărul sau anul nu sunt scrise corect. Mai încearcă o dată.")
 		continue
 	else:
 		#if the part is specified, use it, else consider it to be part 01
 		#part numbers above 1 are mapped in fact to index + 1
-		#Hungarian language version of part 01 is mapped internally to 02 - currently not supported
 		if result.groups()[0] != None:
 			index = result.groups()[0].replace("/", "")
-			if int(index) > 1: 
+			if index == "1m": #Hungarian language version of part 01 is mapped internally to 02
+				index = "2"
+			elif int(index) > 1: 
 				index = str(int(index) + 1)
 			part = "0" + index
 		#if the issue is valid separate number from year and return the two values
 		number = result.groups()[1] #remove spaces and make the string lowercase
 		if number.find('bis') >= 0: #check if bis is present
 			number = number.replace('b', 'B').zfill(7)
+		elif number.find('c') >= 0: #check if c is present
+			number = number.zfill(5)
 		else:
 			number = number.zfill(4)
 		year = result.groups()[2]
