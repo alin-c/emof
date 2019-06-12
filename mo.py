@@ -18,9 +18,9 @@ pdf_location = os.environ['userprofile'] + "\\Desktop\\" #for easy finding
 
 #check the input and continue only if it is valid
 while True:
-	issue = input("Monitorul Oficial ([parte/]număr/an): ").replace(' ', '').lower()
+	issue = input("Monitorul Oficial ([parte/]număr/an): ").replace(' ', '').lower() #remove any space and normalize the string to lowercase
 	pattern = r"(?:(\d)/)*?([\dbis ]+?)/(\d{4})$"
-	part = '01'
+	part = '01' #the default part is 01
 	result = re.match(pattern, issue, re.IGNORECASE)
 	if result == None: #test a regex pattern [\dbis]*?/\d{4}
 		print("\nNumărul sau anul nu sunt scrise corect. Mai încearcă o dată.")
