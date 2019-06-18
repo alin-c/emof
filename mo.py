@@ -32,8 +32,8 @@ pdf.set_display_mode('real', 'continuous')
 file_location = os.environ['temp'] + "\\" #%temp% is used in Windows, for other OS this variable needs to be changed
 pdf_location = os.environ['userprofile'] + "\\Desktop\\" #for easy finding
 
-#the input loop: check the input and continue only if it is valid
 while True:
+	#the input loop: check the input and continue only if it is valid
 	issue = input("Monitorul Oficial ([parte/]număr/an): ").replace(' ', '').lower()
 	pattern = r"(?:(\dm*?)/)*?([\dbis c]+?)/(\d{4})$"
 	part = '01'
@@ -92,8 +92,8 @@ for i in range(1, 2500): #2500 is arbitrary, but probably wouldn't be reached in
 	sys.stdout.flush()
 	file_list.append(file_name) #add image location to the list
 
-#iterate through the list of downloaded images and generate a .pdf
 def make_pdf(image_list):
+	"""iterate through the list of downloaded images and generate a .pdf"""
 	if (not image_list):
 		print("\nNu s-a găsit niciun document!")
 		return 0
@@ -103,8 +103,8 @@ def make_pdf(image_list):
 		pdf.image(image, 0, 0, 210, 297)
 	pdf.output(pdf_location + number + ".pdf", "F")
 
-#iterate through the list of downloaded images and delete them
 def cleanup(image_list):
+	"""iterate through the list of downloaded images and delete them"""
 	if (not image_list):
 		return 0
 	print("\nSunt șterse imaginile descărcate.")
@@ -114,8 +114,8 @@ def cleanup(image_list):
 		else:
 			print("\nNu există imaginea de la adresa: " + image)
 
-#do the document generation and then cleanup, but only if there were images found
 if make_pdf(file_list) != 0:
+	"""do the document generation and then cleanup, but only if there were images found"""
 	cleanup(file_list)
 	print('\nGata! Documentul este salvat aici: ' + pdf_location + number + ".pdf")
 	
