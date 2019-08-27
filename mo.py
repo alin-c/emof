@@ -1,3 +1,6 @@
+import requests, re, sys, os
+from fpdf import FPDF
+
 manifest = """mo.py
 0.0.6
 *********************************************************************************************
@@ -23,8 +26,6 @@ Exemple de utilizare:
 """
 print(manifest) #comment this line to supress the manifest
 
-import requests, re, sys, os
-from fpdf import FPDF
 
 pdf = FPDF('P', 'mm', 'A4')
 pdf.set_display_mode('real', 'continuous')
