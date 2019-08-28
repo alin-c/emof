@@ -31,13 +31,15 @@ pdf = FPDF('P', 'mm', 'A4')
 pdf.set_display_mode('real', 'continuous')
 system = platform.system()
 
-file_location = tempfile.gettempdir() + "\\"
 if system == 'Windows':
+	file_location = tempfile.gettempdir() + "\\"	
 	pdf_location = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop') + "\\"
 elif system == 'Linux' or system == 'Darwin':
-	pdf_location = os.path.join(os.path.join(os.path.expanduser('~')), 'Desktop') + "\\"
+	file_location = tempfile.gettempdir() + "/"	
+	pdf_location = os.path.join(os.path.join(os.path.expanduser('~')), 'Desktop') + "/"
 else:
 	print("Sistem de operare necunoscut. Programul nu poate continua.")
+	sys.exit()
 
 while True:
 	#the input loop: check the input and continue only if it is valid
@@ -125,6 +127,9 @@ if make_pdf(file_list) != 0:
 	"""Do the document generation and then cleanup, but only if there were images found"""
 	cleanup(file_list)
 	print('\nGata! Documentul este salvat aici: ' + pdf_location + number + ".pdf")
-	
-os.system("<nul set /p \"=Apasă orice tastă pentru a ieși din aplicație...\"") #localized pause message
-os.system("pause >nul")
+
+if system == "Windows":	
+	os.system("<nul set /p \"=Apasă orice tastă pentru a ieși din aplicație...\"") #localized pause message
+	os.system("pause >nul")
+elif system == 'Linux' or system == 'Darwin':
+	input("Apasă ENTER pentru a ieși din aplicație...")
