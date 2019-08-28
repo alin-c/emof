@@ -15,13 +15,11 @@ Formatul de input este:
 
 Note:
 * indicarea părții este opțională doar dacă se caută un număr din Partea I
-* pentru Partea I în limba maghiară, trebuie folosit 1m (ex. 1m/21/2019).
 
 Exemple de utilizare:
 1. 1/414/2017 echivalent cu 414/2017 => Partea I, nr. 414 din 2017
 2. 4/2378/2019 => Partea a IV-a, nr. 2378 din 2019
 3. 2/17c/2019 => Partea a II-a, nr. 17/C din 2019
-4. 1m/21/2019 => Partea I în limba maghiară, nr. 21 din 2019
 *********************************************************************************************
 """
 print(manifest) #comment this line to supress the manifest
@@ -55,7 +53,7 @@ while True:
 		#part numbers above 1 are mapped in fact to index + 1
 		if result.groups()[0] != None:
 			index = result.groups()[0].replace("/", "")
-			if index == "1m": #Hungarian language version of part 01 is mapped internally to 02
+			if index == "1m": #Hungarian language version of part 01 is mapped internally to 02; currently, no longer accessible
 				index = "2"
 			elif int(index) > 1: 
 				index = str(int(index) + 1)
@@ -73,7 +71,7 @@ while True:
 
 #prepare the HTTP request to retrieve the images
 url = 'http://www.monitoruloficial.ro/emonitornew/services/view.php'
-user_agent = 'Mozilla/5.0 (Windows NT 6.2; rv:63.0) Gecko/20100101 Firefox/63.0' #this could be randomized
+user_agent = 'Mozilla/5.0 (Windows NT 6.2; rv:68.0) Gecko/20100101 Firefox/68.0' #this could be randomized
 referer = 'http://www.monitoruloficial.ro/emonitornew/emonviewmof.php'
 headers = {'User-Agent': user_agent,
 			'Referer': referer,
