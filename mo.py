@@ -1,10 +1,10 @@
-import requests, re, sys, os
+import requests, re, sys, os, platform, tempfile
 from fpdf import FPDF
 
 manifest = """mo.py
-0.0.6
+0.0.7
 *********************************************************************************************
-Script pentru generarea de documente .pdf, în Windows, pe baza imaginilor publicate de M.O.
+Script pentru generarea de documente .pdf, pe baza imaginilor publicate de M.O.
 Documentul .pdf va fi salvat pe Desktop.
 
 Funcționează numai pentru numerele publicate din 06.06.2017 (de la Partea I, nr. 414/2017)
@@ -29,9 +29,15 @@ print(manifest) #comment this line to supress the manifest
 
 pdf = FPDF('P', 'mm', 'A4')
 pdf.set_display_mode('real', 'continuous')
+system = platform.system()
 
-file_location = os.environ['temp'] + "\\" #%temp% is used in Windows, for other OS this variable needs to be changed
-pdf_location = os.environ['userprofile'] + "\\Desktop\\" #for easy finding
+file_location = tempfile.gettempdir() + "\\"
+if system == 'Windows':
+	pdf_location = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop') + "\\"
+elif system == 'Linux' or system == 'Darwin':
+	pdf_location = os.path.join(os.path.join(os.path.expanduser('~')), 'Desktop') + "\\"
+else:
+	print("Sistem de operare necunoscut. Programul nu poate continua.")
 
 while True:
 	#the input loop: check the input and continue only if it is valid
@@ -94,7 +100,7 @@ for i in range(1, 2500): #2500 is arbitrary, but probably wouldn't be reached in
 	file_list.append(file_name) #add image location to the list
 
 def make_pdf(image_list):
-	"""iterate through the list of downloaded images and generate a .pdf"""
+	"""Iterate through the list of downloaded images and generate a .pdf"""
 	if (not image_list):
 		print("\nNu s-a găsit niciun document!")
 		return 0
@@ -105,7 +111,7 @@ def make_pdf(image_list):
 	pdf.output(pdf_location + number + ".pdf", "F")
 
 def cleanup(image_list):
-	"""iterate through the list of downloaded images and delete them"""
+	"""Iterate through the list of downloaded images and delete them"""
 	if (not image_list):
 		return 0
 	print("\nSunt șterse imaginile descărcate.")
@@ -116,7 +122,7 @@ def cleanup(image_list):
 			print("\nNu există imaginea de la adresa: " + image)
 
 if make_pdf(file_list) != 0:
-	"""do the document generation and then cleanup, but only if there were images found"""
+	"""Do the document generation and then cleanup, but only if there were images found"""
 	cleanup(file_list)
 	print('\nGata! Documentul este salvat aici: ' + pdf_location + number + ".pdf")
 	
