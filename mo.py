@@ -24,11 +24,12 @@ Exemple de utilizare:
 """
 print(manifest) #comment this line to supress the manifest
 
+#set up the fpdf object
 pdf = FPDF('P', 'mm', 'A4')
 pdf.set_display_mode('real', 'continuous')
-system = platform.system()
 
 #set the working folder paths
+system = platform.system()
 if system == 'Windows':
 	file_location = tempfile.gettempdir() + "\\"	
 	pdf_location = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop') + "\\"
@@ -83,7 +84,7 @@ session = requests.Session()
 file_list = [] #a list containing full paths of downloaded files; later used for .pdf generation and then cleanup
 
 #the HTTP request loop, using given criteria
-print("\nSe încearcă descărcarea imaginilor.\n")
+print("\nSe descarcă imaginile.\n")
 for i in range(1, 2500): #2500 is arbitrary, but probably wouldn't be reached in realistic scenarios
 	params['page'] = str(i)
 	response = session.get(url, headers = headers, params = params)
