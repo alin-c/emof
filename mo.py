@@ -24,11 +24,11 @@ Exemple de utilizare:
 """
 print(manifest) #comment this line to supress the manifest
 
-
 pdf = FPDF('P', 'mm', 'A4')
 pdf.set_display_mode('real', 'continuous')
 system = platform.system()
 
+#set the working folder paths
 if system == 'Windows':
 	file_location = tempfile.gettempdir() + "\\"	
 	pdf_location = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop') + "\\"
@@ -39,8 +39,8 @@ else:
 	print("Sistem de operare necunoscut. Programul nu poate continua.")
 	sys.exit()
 
+#the input loop: check the input and continue only if it is valid
 while True:
-	#the input loop: check the input and continue only if it is valid
 	issue = input("Monitorul Oficial ([parte/]număr/an): ").replace(' ', '').lower()
 	pattern = r"(?:(\dm*?)/)*?([\dbis c]+?)/(\d{4})$"
 	part = '01'
@@ -126,6 +126,7 @@ if make_pdf(file_list) != 0:
 	cleanup(file_list)
 	print('\nGata! Documentul este salvat aici: ' + pdf_location + number + ".pdf")
 
+#prevent the console window from exiting without the user being able to see the output
 if system == "Windows":	
 	os.system("<nul set /p \"=Apasă orice tastă pentru a ieși din aplicație...\"") #localized pause message
 	os.system("pause >nul")
