@@ -9,15 +9,15 @@ Formatul de input este:
 
 	[parte/]număr/an
    
-Note:
+### Note:
 * indicarea părții este opțională doar dacă se caută un număr din Partea I
 * testat pe Windows 10 & Python 3.7+, Ubuntu 19.04 & Python 3.7+
 
-Cerințe:
+### Cerințe:
 * Python 3.7+
 * module Python: requests, fpdf
   
-Exemple de utilizare:
+### Exemple de utilizare:
 1. 1/414/2017 echivalent cu 414/2017 => Partea I, nr. 414 din 2017
 2. 4/2378/2019 => Partea a IV-a, nr. 2378 din 2019
 3. 2/17c/2019 => Partea a II-a, nr. 17/C din 2019
