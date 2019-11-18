@@ -1,22 +1,22 @@
-# mo.py - 0.0.7
-  
+# mo.py - 0.0.8
+
 Script pentru generarea de documente .pdf, pe baza imaginilor publicate de M.O.
 Documentul .pdf va fi salvat pe Desktop.
 Funcționează numai pentru numerele publicate din 06.06.2017 (de la Partea I, nr. 414/2017)
 până în prezent.
-   
+
 Formatul de input este:
 
 	[parte/]număr/an
-   
+
 ### Note:
 * indicarea părții este opțională doar dacă se caută un număr din Partea I
-* testat pe Windows 10 & Python 3.7+, Ubuntu 19.04 & Python 3.7+
+* testat pe Windows 10 & Python 3.7+, Ubuntu 19.04 & Python 3.7+, Android P & qpython
 
 ### Cerințe:
 * Python 3.7+
 * module Python: requests, fpdf
-  
+
 ### Exemple de utilizare:
 1. 1/414/2017 echivalent cu 414/2017 => Partea I, nr. 414 din 2017
 2. 4/2378/2019 => Partea a IV-a, nr. 2378 din 2019

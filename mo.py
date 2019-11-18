@@ -2,7 +2,7 @@ import requests, re, sys, os, platform, tempfile
 from fpdf import FPDF
 
 manifest = """mo.py
-0.0.7
+0.0.8
 *********************************************************************************************
 Script pentru generarea de documente .pdf, pe baza imaginilor publicate de M.O.
 Documentul .pdf va fi salvat pe Desktop.
@@ -36,6 +36,8 @@ if system == 'Windows':
 elif system == 'Linux' or system == 'Darwin':
 	file_location = tempfile.gettempdir() + "/"	
 	pdf_location = os.path.join(os.path.join(os.path.expanduser('~')), 'Desktop') + "/"
+	if not os.path.exists(pdf_location): #useful for Android running in qpython
+		pdf_location = '/sdcard/' #assume there is such a folder; I won't bother to really check further for writeable folder...
 else:
 	print("Sistem de operare necunoscut. Programul nu poate continua.")
 	sys.exit()
