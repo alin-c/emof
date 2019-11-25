@@ -1,7 +1,4 @@
-import requests, re, sys, os, platform, tempfile
-from fpdf import FPDF
-
-manifest = """mo.py
+"""mo.py
 0.0.8
 *********************************************************************************************
 Script pentru generarea de documente .pdf, pe baza imaginilor publicate de M.O.
@@ -22,7 +19,10 @@ Exemple de utilizare:
 3. 2/17c/2019 => Partea a II-a, nr. 17/C din 2019
 *********************************************************************************************
 """
-print(manifest) #comment this line to supress the manifest
+print(__doc__) #comment this line to supress the manifest
+
+import requests, re, sys, os, platform, tempfile
+from fpdf import FPDF
 
 #set up the fpdf object
 pdf = FPDF('P', 'mm', 'A4')
@@ -31,10 +31,10 @@ pdf.set_display_mode('real', 'continuous')
 #set the working folder paths
 system = platform.system()
 if system == 'Windows':
-	file_location = tempfile.gettempdir() + "\\"	
+	file_location = tempfile.gettempdir() + "\\"
 	pdf_location = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop') + "\\"
 elif system == 'Linux' or system == 'Darwin':
-	file_location = tempfile.gettempdir() + "/"	
+	file_location = tempfile.gettempdir() + "/"
 	pdf_location = os.path.join(os.path.join(os.path.expanduser('~')), 'Desktop') + "/"
 	if not os.path.exists(pdf_location): #useful for Android running in qpython
 		pdf_location = '/sdcard/' #assume there is such a folder; I won't bother to really check further for writeable folder...
@@ -58,7 +58,7 @@ while True:
 			index = result.groups()[0].replace("/", "")
 			if index == "1m": #Hungarian language version of part 01 is mapped internally to 02; currently, no longer accessible
 				index = "2"
-			elif int(index) > 1: 
+			elif int(index) > 1:
 				index = str(int(index) + 1)
 			part = "0" + index
 		#if the issue is valid separate number from year and return the two values
@@ -90,10 +90,10 @@ print("\nSe descarcă imaginile.\n")
 for i in range(1, 2500): #2500 is arbitrary, but probably wouldn't be reached in realistic scenarios
 	params['page'] = str(i)
 	response = session.get(url, headers = headers, params = params)
-	
+
 	if str(response.content).find('Error') >= 0: #exit the loop if 'Error' is detected in the response
 		break
-	
+
 	file_name = file_location + number + '-' + params['page'] + '.jpg'
 	with open(file_name, 'wb') as fd:
 		for chunk in response.iter_content(chunk_size=128):
@@ -130,7 +130,7 @@ if make_pdf(file_list) != 0:
 	print('\nGata! Documentul este salvat aici: ' + pdf_location + number + ".pdf")
 
 #prevent the console window from exiting without the user being able to see the output
-if system == "Windows":	
+if system == "Windows":
 	os.system("<nul set /p \"=Apasă orice tastă pentru a ieși din aplicație...\"") #localized pause message
 	os.system("pause >nul")
 elif system == 'Linux' or system == 'Darwin':
