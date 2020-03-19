@@ -1,4 +1,5 @@
-"""mo.py
+"""
+mo.py
 0.0.8
 *********************************************************************************************
 Script pentru generarea de documente .pdf, pe baza imaginilor publicate de M.O.
@@ -32,10 +33,12 @@ pdf.set_display_mode('real', 'continuous')
 system = platform.system()
 if system == 'Windows':
 	file_location = tempfile.gettempdir() + "\\"
-	pdf_location = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop') + "\\"
+	pdf_location = os.path.join(
+	    os.path.join(os.environ['USERPROFILE']), 'Desktop') + "\\"
 elif system == 'Linux' or system == 'Darwin':
 	file_location = tempfile.gettempdir() + "/"
-	pdf_location = os.path.join(os.path.join(os.path.expanduser('~')), 'Desktop') + "/"
+	pdf_location = os.path.join(os.path.join(os.path.expanduser('~')),
+	                            'Desktop') + "/"
 	if not os.path.exists(pdf_location): #useful for Android running in qpython
 		pdf_location = '/sdcard/' #assume there is such a folder; I won't bother to really check further for writeable folder...
 else:
@@ -44,12 +47,15 @@ else:
 
 #the input loop: check the input and continue only if it is valid
 while True:
-	issue = input("Monitorul Oficial ([parte/]număr/an): ").replace(' ', '').lower()
+	issue = input("Monitorul Oficial ([parte/]număr/an): ").replace(' ',
+	                                                                '').lower()
 	pattern = r"(?:(\dm*?)/)*?([\dbis c]+?)/(\d{4})$"
 	part = '01'
 	result = re.match(pattern, issue, re.IGNORECASE)
 	if result == None: #test a regex pattern [\dbis]*?/\d{4}
-		print("\nPartea, numărul sau anul nu sunt scrise corect. Mai încearcă o dată.")
+		print(
+		    "\nPartea, numărul sau anul nu sunt scrise corect. Mai încearcă o dată."
+		)
 		continue
 	else:
 		#if the part is specified, use it, else consider it to be part 01
@@ -76,22 +82,26 @@ while True:
 url = 'http://www.monitoruloficial.ro/emonitornew/services/view.php'
 user_agent = 'Mozilla/5.0 (Windows NT 6.2; rv:68.0) Gecko/20100101 Firefox/68.0' #this could be randomized
 referer = 'http://www.monitoruloficial.ro/emonitornew/emonviewmof.php'
-headers = {'User-Agent': user_agent,
-			'Referer': referer,
-			'X-Requested-With': 'XMLHttpRequest'}
-params = {'doc': part + year + number,
-			'format': 'jpg',
-			'page': '1'}
+headers = {
+    'User-Agent': user_agent,
+    'Referer': referer,
+    'X-Requested-With': 'XMLHttpRequest'
+}
+params = {'doc': part + year + number, 'format': 'jpg', 'page': '1'}
 session = requests.Session()
-file_list = [] #a list containing full paths of downloaded files; later used for .pdf generation and then cleanup
+file_list = [
+] #a list containing full paths of downloaded files; later used for .pdf generation and then cleanup
 
 #the HTTP request loop, using given criteria
 print("\nSe descarcă imaginile.\n")
-for i in range(1, 2500): #2500 is arbitrary, but probably wouldn't be reached in realistic scenarios
+for i in range(
+    1, 2500
+): #2500 is arbitrary, but probably wouldn't be reached in realistic scenarios
 	params['page'] = str(i)
-	response = session.get(url, headers = headers, params = params)
+	response = session.get(url, headers=headers, params=params)
 
-	if str(response.content).find('Error') >= 0: #exit the loop if 'Error' is detected in the response
+	if str(response.content).find(
+	    'Error') >= 0: #exit the loop if 'Error' is detected in the response
 		break
 
 	file_name = file_location + number + '-' + params['page'] + '.jpg'
@@ -101,6 +111,7 @@ for i in range(1, 2500): #2500 is arbitrary, but probably wouldn't be reached in
 	print(str(i), end=' ') #display the progress
 	sys.stdout.flush()
 	file_list.append(file_name) #add image location to the list
+
 
 def make_pdf(image_list):
 	"""Iterate through the list of downloaded images and generate a .pdf"""
@@ -113,6 +124,7 @@ def make_pdf(image_list):
 		pdf.image(image, 0, 0, 210, 297)
 	pdf.output(pdf_location + number + ".pdf", "F")
 
+
 def cleanup(image_list):
 	"""Iterate through the list of downloaded images and delete them"""
 	if (not image_list):
@@ -124,14 +136,17 @@ def cleanup(image_list):
 		else:
 			print("\nNu există imaginea de la adresa: " + image)
 
+
 if make_pdf(file_list) != 0:
 	"""Do the document generation and then cleanup, but only if there were images found"""
 	cleanup(file_list)
-	print('\nGata! Documentul este salvat aici: ' + pdf_location + number + ".pdf")
+	print('\nGata! Documentul este salvat aici: ' + pdf_location + number +
+	      ".pdf")
 
 #prevent the console window from exiting without the user being able to see the output
 if system == "Windows":
-	os.system("<nul set /p \"=Apasă orice tastă pentru a ieși din aplicație...\"") #localized pause message
+	os.system("<nul set /p \"=Apasă orice tastă pentru a ieși din aplicație...\""
+	         ) #localized pause message
 	os.system("pause >nul")
 elif system == 'Linux' or system == 'Darwin':
 	input("Apasă ENTER pentru a ieși din aplicație...")
